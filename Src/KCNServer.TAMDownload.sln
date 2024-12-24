@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TAMDownload.Core", "TAMDownload.Core\TAMDownload.Core.csproj", "{6E0516B7-5392-4815-8BB1-39571C905887}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TAMDownload.Config", "TAMDownload.Config\TAMDownload.Config.csproj", "{EE8DCCE3-CFD0-4F9D-A247-734F836A9ED0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TAMDownload.GUI", "TAMDownload.GUI\TAMDownload.GUI.csproj", "{A82A2E93-78F1-4E9E-9948-7DF0D50E2460}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E0516B7-5392-4815-8BB1-39571C905887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0516B7-5392-4815-8BB1-39571C905887}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0516B7-5392-4815-8BB1-39571C905887}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0516B7-5392-4815-8BB1-39571C905887}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE8DCCE3-CFD0-4F9D-A247-734F836A9ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE8DCCE3-CFD0-4F9D-A247-734F836A9ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE8DCCE3-CFD0-4F9D-A247-734F836A9ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE8DCCE3-CFD0-4F9D-A247-734F836A9ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A82A2E93-78F1-4E9E-9948-7DF0D50E2460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A82A2E93-78F1-4E9E-9948-7DF0D50E2460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A82A2E93-78F1-4E9E-9948-7DF0D50E2460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A82A2E93-78F1-4E9E-9948-7DF0D50E2460}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
