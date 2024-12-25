@@ -13,12 +13,6 @@
 
 ![Github](https://socialify.git.ci/JDDKCN/TwitterAccountMediaDownload/image?description=1&forks=1&issues=1&language=1&logo=https%3A%2F%2Favatars.githubusercontent.com/u/103011451?v=4&name=1&owner=1&pulls=1&stargazers=1&theme=Light)
 
-<div align="center"><strong>
-
- 🇨🇳简体中文 | [🇹🇼繁体中文](./README_zh_TW.md) | [🇺🇸English](./README_en_US.md) | [🇯🇵日本語](./README_ja_JP.md) 
-
-</strong></div>
-
 ## 📘 项目介绍
 
 本项目是为 `Twitter (X)` 编写的账号点赞、书签等媒体的爬虫下载器。程序内核与GUI均使用 `.NET9` 构建。 本项目使用 `A-GPLv3` 开源协议。
