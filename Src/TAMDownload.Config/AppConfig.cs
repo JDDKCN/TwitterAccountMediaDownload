@@ -57,11 +57,6 @@ namespace TAMDownload.Config
         public static string ReadJson => File.ReadAllText(JsonPath);
 
         /// <summary>
-        /// 用户名
-        /// </summary>
-        public string? UserName { get; set; }
-
-        /// <summary>
         /// 浏览器UA
         /// </summary>
         public string? Ua { get; set; }
@@ -133,7 +128,6 @@ namespace TAMDownload.Config
         {
             var config = new App
             {
-                UserName = "",
                 Ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
                 SavePath = ".\\media",
                 GetType = GetTypes.Likes,

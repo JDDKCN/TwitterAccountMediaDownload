@@ -31,9 +31,6 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             uiStyleManager1 = new Sunny.UI.UIStyleManager(components);
-            uiPanel1 = new Sunny.UI.UIPanel();
-            txtUserName = new Sunny.UI.UITextBox();
-            uiLabel1 = new Sunny.UI.UILabel();
             uiPanel2 = new Sunny.UI.UIPanel();
             uiButton1 = new Sunny.UI.UIButton();
             txtSavePath = new Sunny.UI.UITextBox();
@@ -64,7 +61,6 @@
             uiLabel8 = new Sunny.UI.UILabel();
             uiLinkLabel1 = new Sunny.UI.UILinkLabel();
             uiLinkLabel2 = new Sunny.UI.UILinkLabel();
-            uiPanel1.SuspendLayout();
             uiPanel2.SuspendLayout();
             uiPanel3.SuspendLayout();
             uiPanel4.SuspendLayout();
@@ -80,56 +76,17 @@
             uiStyleManager1.GlobalFontName = "微软雅黑";
             uiStyleManager1.GlobalFontScale = 125;
             // 
-            // uiPanel1
-            // 
-            uiPanel1.Controls.Add(txtUserName);
-            uiPanel1.Controls.Add(uiLabel1);
-            uiPanel1.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiPanel1.Location = new Point(18, 57);
-            uiPanel1.Margin = new Padding(4, 5, 4, 5);
-            uiPanel1.MinimumSize = new Size(1, 1);
-            uiPanel1.Name = "uiPanel1";
-            uiPanel1.Size = new Size(338, 123);
-            uiPanel1.TabIndex = 0;
-            uiPanel1.Text = null;
-            uiPanel1.TextAlignment = ContentAlignment.MiddleCenter;
-            // 
-            // txtUserName
-            // 
-            txtUserName.Font = new Font("微软雅黑", 13F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            txtUserName.Location = new Point(20, 54);
-            txtUserName.Margin = new Padding(4, 5, 4, 5);
-            txtUserName.MinimumSize = new Size(1, 16);
-            txtUserName.Name = "txtUserName";
-            txtUserName.Padding = new Padding(5);
-            txtUserName.ShowText = false;
-            txtUserName.Size = new Size(296, 57);
-            txtUserName.TabIndex = 2;
-            txtUserName.TextAlignment = ContentAlignment.MiddleLeft;
-            txtUserName.Watermark = "";
-            // 
-            // uiLabel1
-            // 
-            uiLabel1.Font = new Font("微软雅黑", 13F);
-            uiLabel1.ForeColor = Color.FromArgb(48, 48, 48);
-            uiLabel1.Location = new Point(20, 8);
-            uiLabel1.Name = "uiLabel1";
-            uiLabel1.Size = new Size(296, 41);
-            uiLabel1.TabIndex = 1;
-            uiLabel1.Text = "用户ID(@后面的)：";
-            uiLabel1.TextAlign = ContentAlignment.MiddleLeft;
-            // 
             // uiPanel2
             // 
             uiPanel2.Controls.Add(uiButton1);
             uiPanel2.Controls.Add(txtSavePath);
             uiPanel2.Controls.Add(uiLabel2);
             uiPanel2.Font = new Font("宋体", 12F, FontStyle.Regular, GraphicsUnit.Point, 134);
-            uiPanel2.Location = new Point(364, 57);
+            uiPanel2.Location = new Point(18, 57);
             uiPanel2.Margin = new Padding(4, 5, 4, 5);
             uiPanel2.MinimumSize = new Size(1, 1);
             uiPanel2.Name = "uiPanel2";
-            uiPanel2.Size = new Size(617, 123);
+            uiPanel2.Size = new Size(963, 123);
             uiPanel2.TabIndex = 3;
             uiPanel2.Text = null;
             uiPanel2.TextAlignment = ContentAlignment.MiddleCenter;
@@ -137,7 +94,7 @@
             // uiButton1
             // 
             uiButton1.Font = new Font("微软雅黑", 13F);
-            uiButton1.Location = new Point(463, 54);
+            uiButton1.Location = new Point(809, 54);
             uiButton1.MinimumSize = new Size(1, 1);
             uiButton1.Name = "uiButton1";
             uiButton1.Size = new Size(135, 57);
@@ -156,7 +113,7 @@
             txtSavePath.Padding = new Padding(5);
             txtSavePath.ReadOnly = true;
             txtSavePath.ShowText = false;
-            txtSavePath.Size = new Size(436, 57);
+            txtSavePath.Size = new Size(782, 57);
             txtSavePath.TabIndex = 2;
             txtSavePath.TextAlignment = ContentAlignment.MiddleLeft;
             txtSavePath.Watermark = "";
@@ -531,14 +488,12 @@
             Controls.Add(uiPanel4);
             Controls.Add(uiPanel3);
             Controls.Add(uiPanel2);
-            Controls.Add(uiPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "FormMain";
             Text = "KCN-Server";
             ZoomScaleRect = new Rectangle(22, 22, 800, 450);
             Load += FormMain_Load;
-            uiPanel1.ResumeLayout(false);
             uiPanel2.ResumeLayout(false);
             uiPanel3.ResumeLayout(false);
             uiPanel4.ResumeLayout(false);
@@ -551,9 +506,6 @@
         #endregion
 
         private Sunny.UI.UIStyleManager uiStyleManager1;
-        private Sunny.UI.UIPanel uiPanel1;
-        private Sunny.UI.UILabel uiLabel1;
-        private Sunny.UI.UITextBox txtUserName;
         private Sunny.UI.UIPanel uiPanel2;
         private Sunny.UI.UITextBox txtSavePath;
         private Sunny.UI.UILabel uiLabel2;

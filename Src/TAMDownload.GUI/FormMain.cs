@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using TAMDownload.Config;
 using TAMDownload.GUI.Utils;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TAMDownload.GUI
 {
@@ -25,7 +24,6 @@ namespace TAMDownload.GUI
                 return;
             }
 
-            txtUserName.Text = config.UserName;
             rtxtUA.Text = config.Ua;
             txtSavePath.Text = config.SavePath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "media");
             cbEnableProxy.Checked = !string.IsNullOrEmpty(config.Proxys.Http) && !string.IsNullOrEmpty(config.Proxys.Https);
@@ -51,12 +49,11 @@ namespace TAMDownload.GUI
 
         private async void uiButton2_Click(object sender, EventArgs e)
         {
-            if (!InputChecker.TextCheck(txtUserName) || !InputChecker.TextCheck(rtxtUA) || !InputChecker.TextCheck(txtSavePath))
+            if (!InputChecker.TextCheck(rtxtUA) || !InputChecker.TextCheck(txtSavePath))
                 return;
 
             App config = App.ReadConfig();
 
-            config.UserName = txtUserName.Text;
             config.Ua = rtxtUA.Text;
             config.SavePath = txtSavePath.Text;
 

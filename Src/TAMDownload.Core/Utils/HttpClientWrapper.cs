@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
 using TAMDownload.Config;
-using TAMDownload.Core.Services;
 
 namespace TAMDownload.Core.Utils
 {
@@ -9,7 +8,7 @@ namespace TAMDownload.Core.Utils
     {
         private readonly HttpClient _client;
         private readonly CookieContainer _cookieContainer;
-        private string CookieFile = "twitter_cookie.json";
+        private readonly string CookieFile = "twitter_cookie.json";
 
         public HttpClientWrapper(App config)
         {
@@ -95,21 +94,13 @@ namespace TAMDownload.Core.Utils
         {
             string value = GetCookie("twid");
             if (string.IsNullOrEmpty(value))
-            {
-                Console.WriteLine("未找到twid Cookie");
                 return string.Empty;
-            }
 
             try
             {
                 var decoded = Uri.UnescapeDataString(value);
                 if (!decoded.StartsWith("u="))
-                {
-                    Console.WriteLine("twid格式不正确");
                     return string.Empty;
-                }
-
-                Console.WriteLine($"从Cookie中获取到TwID: {decoded.Substring(2)}"); 
                 return decoded.Substring(2);
             }
             catch (Exception ex)

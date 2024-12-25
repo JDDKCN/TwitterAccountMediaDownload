@@ -8,15 +8,13 @@ namespace TAMDownload.Core.Services
     public class TwitterApiService
     {
         private readonly HttpClientWrapper _http;
-        private readonly App _config;
         private const string Host = "https://x.com";
         private const string LikeUrl = Host + "/i/api/graphql/oLLzvV4gwmdq_nhPM4cLwg/Likes";
         private const string BookmarkUrl = Host + "/i/api/graphql/Ds7FCVYEIivOKHsGcE84xQ/Bookmarks";
 
-        public TwitterApiService(HttpClientWrapper http, App config)
+        public TwitterApiService(HttpClientWrapper http)
         {
             _http = http;
-            _config = config;
         }
 
         /// <summary>
@@ -57,7 +55,7 @@ namespace TAMDownload.Core.Services
 
                 // 设置请求头
                 request.Headers.Add("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA");
-                request.Headers.Add("Referer", $"https://x.com/{_config.UserName}/likes");
+                // request.Headers.Add("Referer", $"https://x.com/{_config.UserName}/likes");
                 request.Headers.Add("x-csrf-token", _http.GetCookie("ct0"));
                 request.Headers.Add("x-twitter-active-user", "yes");
                 request.Headers.Add("x-twitter-auth-type", "OAuth2Session");

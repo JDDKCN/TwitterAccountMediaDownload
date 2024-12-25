@@ -85,7 +85,7 @@ namespace TAMDownload.Core.Utils
                 Console.WriteLine($"Processing tweet {tweet.Id}");
 
                 // 使用tweet的用户ID找到对应的用户信息
-                var userId = tweet.UserId; 
+                var userId = tweet.UserId;
                 if (!users.TryGetValue(userId, out var user))
                 {
                     Console.WriteLine($"User not found for tweet {tweet.Id}");

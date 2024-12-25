@@ -16,12 +16,7 @@ namespace TAMDownload.Core
                 Console.WriteLine(ConstConfig.Copyright + "\n");
 
                 if (!File.Exists(App.JsonPath))
-                {
                     App.CreateConfig();
-                    Console.WriteLine("请填写配置文件。");
-                    Console.ReadLine();
-                    return;
-                }
 
                 var config = App.ReadConfig();
                 if (config == null)
@@ -33,12 +28,11 @@ namespace TAMDownload.Core
 
                 string basePath = config.SavePath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "media");
                 var http = new HttpClientWrapper(config);
-                var twitterService = new TwitterApiService(http, config);
+                var twitterService = new TwitterApiService(http);
                 var downloadService = new DownloadService(http, basePath);
 
                 TwitterApiService.UserId = http.GetTwID();
 
-                Console.WriteLine($"下载账号：{config.UserName}");
                 Console.WriteLine("下载路径: " + basePath);
 
                 if (App.DownloadTypes.Photo == config.DownloadType)
@@ -68,7 +62,7 @@ namespace TAMDownload.Core
                 }
                 else
                 {
-                    Console.WriteLine("未知的获取类型");
+                    Console.WriteLine("未知的获取类型，请检查配置文件。");
                 }
             }
             catch (Exception ex)
