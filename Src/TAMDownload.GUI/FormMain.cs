@@ -13,7 +13,7 @@ namespace TAMDownload.GUI
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            Text = ConstConfig.APPName + ConstConfig.VersionStr;
+            Text = ConstConfig.APPName + ConstConfig.VersionStr + "  [Ãâ·ÑÈí¼þ£¬½ûÖ¹µ¹Âô]";
             uiLabel8.Text = ConstConfig.Copyright;
 
             App config = App.ReadConfig();
