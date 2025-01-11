@@ -1,5 +1,6 @@
 ﻿using Sunny.UI;
 using System.Runtime.InteropServices;
+using TAMDownload.Config.Language;
 
 namespace TAMDownload.GUI.Utils
 {
@@ -35,56 +36,73 @@ namespace TAMDownload.GUI.Utils
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowErrorDialog("Error", msg);
+            form.ShowErrorDialog2(LanguageHelper.CurrentLanguage.GUIMessage.Error, msg);
         }
 
         public static void Error(string msg, string title)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowErrorDialog(title, msg);
+            form.ShowErrorDialog2(title, msg);
         }
 
         public static void Warning(string msg)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowWarningDialog("Warn", msg);
+            form.ShowWarningDialog2(LanguageHelper.CurrentLanguage.GUIMessage.Warn, msg);
         }
 
         public static void Warning(string msg, string title)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowWarningDialog(title, msg);
+            form.ShowWarningDialog2(title, msg);
         }
 
         public static void OK(string msg)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowSuccessDialog("OK", msg);
+            form.ShowSuccessDialog2(LanguageHelper.CurrentLanguage.GUIMessage.Success, msg);
         }
 
         public static void OK(string msg, string title)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowSuccessDialog(title, msg);
+            form.ShowSuccessDialog2(title, msg);
         }
 
         public static void Info(string msg)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowInfoDialog("Info", msg, UIStyle.Blue);
+            form.ShowInfoDialog2(LanguageHelper.CurrentLanguage.GUIMessage.Info, msg);
         }
 
         public static void Info(string msg, string title)
         {
             Sunny.UI.UIForm form = new Sunny.UI.UIForm();
             form.Location = ScreenCentralLocation(form);
-            form.ShowInfoDialog(title, msg, UIStyle.Blue);
+            form.ShowInfoDialog2(title, msg);
+        }
+
+        public static bool ShowBool(string msg, string title, UIStyle style = UIStyle.Blue, bool showMask = false, UIMessageDialogButtons defaultButton = UIMessageDialogButtons.Cancel, int delay = 0)
+        {
+            using UIMessageForm2 uIMessageForm = new UIMessageForm2(title, msg, UINotifierType.Ask, defaultButton);
+
+            uIMessageForm.Delay = delay;
+            uIMessageForm.StyleCustomMode = true;
+            uIMessageForm.Style = style;
+            uIMessageForm.StartPosition = FormStartPosition.CenterScreen;
+            uIMessageForm.Location = ScreenCentralLocation(uIMessageForm);
+            uIMessageForm.ShowInTaskbar = false;
+            uIMessageForm.TopMost = true;
+            uIMessageForm.Render();
+
+            return showMask ? (uIMessageForm.ShowDialogWithMask() == DialogResult.OK) 
+                : (uIMessageForm.ShowDialog() == DialogResult.OK);
         }
     }
 }

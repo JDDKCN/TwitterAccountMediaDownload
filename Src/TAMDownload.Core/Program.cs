@@ -1,74 +1,108 @@
 ﻿using TAMDownload.Config;
+using TAMDownload.Config.Cookie;
+using TAMDownload.Config.Language;
 using TAMDownload.Core.Services;
 using TAMDownload.Core.Utils;
 using static TAMDownload.Core.Utils.MetadataExtensions;
 
 namespace TAMDownload.Core
 {
-    public class Program
+    internal class Program
     {
-        public static async Task Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
-                Console.WriteLine(ConstConfig.APPName);
-                Console.WriteLine("版本: " + ConstConfig.VersionStr);
-                Console.WriteLine(ConstConfig.Copyright + "\n");
-
                 if (!File.Exists(App.JsonPath))
                     App.CreateConfig();
 
-                var config = App.ReadConfig();
-                if (config == null)
+                if (!File.Exists(CookiesSelectConfig.JsonPath))
+                    CookiesSelectConfig.CreateConfig();
+
+                var langHelper = LanguageHelper.Instance;
+                await langHelper.InitLanguageAsync();
+
+                Console.WriteLine(ConstConfig.Copyright);
+
+                if (LanguageHelper.CurrentLanguage.LanguageCode == "zh_CN")
                 {
-                    Console.WriteLine("配置加载失败，请重置。");
+                    Console.Title = ConstConfig.APPName + ConstConfig.VersionStr + "  [免费软件，禁止倒卖]";
+                    Console.WriteLine(ConstConfig.APPName + " - " + ConstConfig.VersionStr + "\n");
+                }
+                else
+                {
+                    Console.Title = ConstConfig.APPNameEn + ConstConfig.VersionStr + "  [免费软件/Free Software]";
+                    Console.WriteLine(ConstConfig.APPNameEn + " - " + ConstConfig.VersionStr + "\n");
+                }
+
+                var config = App.ReadConfig();
+                var cookiesConfig = CookiesSelectConfig.ReadConfig();
+
+                if (config == null || cookiesConfig == null)
+                {
+                    Console.WriteLine(LanguageHelper.CurrentLanguage.GUIMessage.ConfigErrTips);
                     Console.ReadLine();
                     return;
                 }
 
                 string basePath = config.SavePath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "media");
-                var http = new HttpClientWrapper(config);
+                var http = new HttpClientWrapper(config, cookiesConfig);
                 var twitterService = new TwitterApiService(http);
-                var downloadService = new DownloadService(http, basePath);
+                var downloadService = new DownloadService(config, http, basePath, config.Network.TimeOut, config.Network.RetryTime);
 
                 TwitterApiService.UserId = http.GetTwID();
 
-                Console.WriteLine("下载路径: " + basePath);
+                Console.WriteLine(LanguageHelper.CurrentLanguage.GUIMessage.MediaSaveDirPath + " : " + Path.GetFullPath(basePath));
 
-                if (App.DownloadTypes.Photo == config.DownloadType)
-                    Console.WriteLine("下载内容：仅下载图片。");
-                else if (App.DownloadTypes.Video == config.DownloadType)
-                    Console.WriteLine("下载内容：仅下载视频。");
-                else if (App.DownloadTypes.AnimatedGif == config.DownloadType)
-                    Console.WriteLine("下载内容：仅下载动图。");
-                else
-                    Console.WriteLine("下载内容：下载全部内容。");
+                if (config.DownloadType.Count <= 0)
+                {
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.Error} : {LanguageHelper.CurrentLanguage.CoreMessage.DownloadConfigIsEmptyTips}");
+                    return;
+                }
 
-                if (App.GetTypes.Likes == config.GetType)
-                {
-                    Console.WriteLine("点赞获取模式。");
-                    await GetLikes(http, twitterService, downloadService, config);
-                }
-                else if (App.GetTypes.BookMarks == config.GetType)
-                {
-                    Console.WriteLine("书签获取模式。");
-                    await GetBookMarks(http, twitterService, downloadService, config);
-                }
-                else if (App.GetTypes.All == config.GetType)
-                {
-                    Console.WriteLine("全部获取模式。");
-                    await GetLikes(http, twitterService, downloadService, config);
-                    await GetBookMarks(http, twitterService, downloadService, config);
-                }
-                else
-                {
-                    Console.WriteLine("未知的获取类型，请检查配置文件。");
-                }
+                await SwitchDownloaderMode(http, twitterService, downloadService, config);
+
+                Console.WriteLine("\n\n" + string.Format(LanguageHelper.CurrentLanguage.CoreMessage.DownloadStatistics,
+                downloadService.PhotosNum + downloadService.VideosNum + downloadService.GIFsNum,
+                downloadService.PhotosNum, downloadService.VideosNum, downloadService.GIFsNum));
+
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"发生错误: {ex.Message}");
-                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}\n{ex.StackTrace}");
+                Console.ReadLine();
+            }
+        }
+
+        private static async Task SwitchDownloaderMode(HttpClientWrapper http, TwitterApiService twitterService, DownloadService downloadService, App config)
+        {
+            switch (config.GetType)
+            {
+                case App.GetTypes.Likes:
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.Likes}{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesMode}.");
+                    await GetLikes(http, twitterService, downloadService, config);
+                    break;
+                case App.GetTypes.BookMarks:
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.BookMarks}{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesMode}.");
+                    await GetBookMarks(http, twitterService, downloadService, config);
+                    break;
+                case App.GetTypes.Account:
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.AccountType}{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesMode}.");
+                    await GetAccountMedia(http, twitterService, downloadService, config);
+                    break;
+                case App.GetTypes.Tweet:
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.TweetType}{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesMode}.");
+                    await GetTweetDetail(http, twitterService, downloadService, config);
+                    break;
+                case App.GetTypes.All:
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.AllTypes}{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesMode}.");
+                    await GetLikes(http, twitterService, downloadService, config);
+                    await GetBookMarks(http, twitterService, downloadService, config);
+                    break;
+                default:
+                    Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.UnknownGetTypesModeTips);
+                    break;
             }
         }
 
@@ -84,24 +118,24 @@ namespace TAMDownload.Core
         {
             try
             {
-                Console.WriteLine("开始获取点赞内容...");
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesStart}{LanguageHelper.CurrentLanguage.GUIMessage.Likes}...");
                 var metadata = LoadMetadata(App.GetTypes.Likes);
                 var currentPage = metadata?.CurrentPage ?? "";
                 var totalTweets = 0;
 
                 while (true)
                 {
-                    Console.WriteLine($"正在获取页面: {(string.IsNullOrEmpty(currentPage) ? "首页" : currentPage)}");
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetPages} : {(string.IsNullOrEmpty(currentPage) ? LanguageHelper.CurrentLanguage.CoreMessage.HomePage : currentPage)}");
                     var (tweets, nextPage) = await twitterService.GetLikesAsync(currentPage);
 
                     if (!tweets.Any())
                     {
-                        Console.WriteLine("当前页面没有新的点赞内容");
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetPagesNoNewMedia);
                         break;
                     }
 
                     totalTweets += tweets.Count;
-                    Console.WriteLine($"本页获取到 {tweets.Count} 条推文");
+                    Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.GetMediaByThisPage, tweets.Count));
 
                     // 更新元数据
                     var newMetadata = tweets.ToMetadataContainer(nextPage, twitterService.Users);
@@ -112,25 +146,25 @@ namespace TAMDownload.Core
                     SaveMetadata(metadata, App.GetTypes.Likes);
 
                     // 下载新内容
-                    Console.WriteLine($"开始下载第 {totalTweets} 条推文的媒体文件...");
+                    Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.DownloadTweetMediaTaskStart, totalTweets));
                     await downloadService.DownloadMediaAsync(newMetadata, App.GetTypes.Likes, config.DownloadType);
 
                     if (string.IsNullOrEmpty(nextPage))
                     {
-                        Console.WriteLine("已到达最后一页");
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetLastPages);
                         break;
                     }
 
                     currentPage = nextPage;
-                    Console.WriteLine("准备获取下一页...");
+                    Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetNextPages);
                     await Task.Delay(1000); // 请求过快可能会封IP或者ban掉account
                 }
 
-                Console.WriteLine($"任务完成，共处理 {totalTweets} 条推文");
+                Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.GetTweetTaskCompleted, totalTweets));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"获取点赞时发生错误: {ex.Message}");
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.Likes} - {LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}\n{ex.StackTrace}");
             }
         }
 
@@ -146,24 +180,24 @@ namespace TAMDownload.Core
         {
             try
             {
-                Console.WriteLine("开始获取书签内容...");
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesStart}{LanguageHelper.CurrentLanguage.GUIMessage.BookMarks}...");
                 var metadata = LoadMetadata(App.GetTypes.BookMarks);
                 var currentPage = metadata?.CurrentPage ?? "";
                 var totalTweets = 0;
 
                 while (true)
                 {
-                    Console.WriteLine($"正在获取书签页面: {(string.IsNullOrEmpty(currentPage) ? "首页" : currentPage)}");
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetPages} : {(string.IsNullOrEmpty(currentPage) ? LanguageHelper.CurrentLanguage.CoreMessage.HomePage : currentPage)}");
                     var (tweets, nextPage) = await twitterService.GetBookmarksAsync(currentPage);
 
                     if (!tweets.Any())
                     {
-                        Console.WriteLine("当前页面没有新的书签内容");
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetPagesNoNewMedia);
                         break;
                     }
 
                     totalTweets += tweets.Count;
-                    Console.WriteLine($"本页获取到 {tweets.Count} 条书签推文");
+                    Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.GetMediaByThisPage, tweets.Count));
 
                     // 更新元数据
                     var newMetadata = tweets.ToMetadataContainer(nextPage, twitterService.Users);
@@ -178,7 +212,7 @@ namespace TAMDownload.Core
 
                     if (string.IsNullOrEmpty(nextPage))
                     {
-                        Console.WriteLine("已到达最后一页");
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetLastPages);
                         break;
                     }
 
@@ -188,7 +222,90 @@ namespace TAMDownload.Core
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"获取书签时发生错误: {ex.Message}");
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.BookMarks} - {LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// 获取单账号媒体内容
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="twitterService"></param>
+        /// <param name="downloadService"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private static async Task GetAccountMedia(HttpClientWrapper http, TwitterApiService twitterService, DownloadService downloadService, App config)
+        {
+            try
+            {
+                var accountMsg = await twitterService.GetUserIdByScreenNameAsync(config.GetTypeMsg.Replace("@", string.Empty));
+                if (accountMsg.id == null)
+                {
+                    Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.UnknownGetUserAccountMsgTips);
+                    return;
+                }
+
+                Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.GetMediaByUserAccount, $"{accountMsg.name}({accountMsg.screenName})"));
+                var metadata = LoadMetadata(App.GetTypes.Account, accountMsg.screenName);
+                var currentPage = metadata?.CurrentPage ?? "";
+                var totalTweets = 0;
+
+                await Task.Delay(1000);
+
+                while (true)
+                {
+                    Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetPages} : {(string.IsNullOrEmpty(currentPage) ? LanguageHelper.CurrentLanguage.CoreMessage.HomePage : currentPage)}");
+                    var (tweets, nextPage) = await twitterService.GetUserMediaAsync(accountMsg.id, currentPage);
+
+                    if (!tweets.Any())
+                    {
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetPagesNoNewMedia);
+                        break;
+                    }
+
+                    totalTweets += tweets.Count;
+                    Console.WriteLine(string.Format(LanguageHelper.CurrentLanguage.CoreMessage.GetMediaByThisPage, tweets.Count));
+
+                    // 更新元数据
+                    var newMetadata = tweets.ToMetadataContainer(nextPage, twitterService.Users);
+                    MergeMetadata(metadata, newMetadata);
+                    metadata.CurrentPage = nextPage;
+
+                    // 保存元数据
+                    SaveMetadata(metadata, App.GetTypes.Account, accountMsg.screenName);
+
+                    // 下载新内容
+                    await downloadService.DownloadMediaAsync(newMetadata, App.GetTypes.Account, config.DownloadType);
+
+                    if (string.IsNullOrEmpty(nextPage))
+                    {
+                        Console.WriteLine(LanguageHelper.CurrentLanguage.CoreMessage.GetLastPages);
+                        break;
+                    }
+
+                    currentPage = nextPage;
+                    await Task.Delay(1000);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.AccountType} - {LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        private static async Task GetTweetDetail(HttpClientWrapper http, TwitterApiService twitterService, DownloadService downloadService, App config)
+        {
+            try
+            {
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.GetTypesStart}{LanguageHelper.CurrentLanguage.GUIMessage.TweetType}...");
+
+                var tweets = await twitterService.GetTweetDetailAsync(config.GetTypeMsg);
+                var metadata = tweets.ToMetadataContainer(string.Empty, twitterService.Users);
+                await downloadService.DownloadMediaAsync(metadata, App.GetTypes.Tweet, config.DownloadType);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.GUIMessage.TweetType} - {LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}\n{ex.StackTrace}");
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text.Json;
 using TAMDownload.Config;
+using TAMDownload.Config.Cookie;
+using TAMDownload.Config.Language;
 
 namespace TAMDownload.Core.Utils
 {
@@ -8,16 +10,20 @@ namespace TAMDownload.Core.Utils
     {
         private readonly HttpClient _client;
         private readonly CookieContainer _cookieContainer;
+        private CookiesSelectHelper _cookiesSelectHelper;
+        private CookiesSelectConfig _cookiesSelectConfig;
         private readonly string CookieFile = "twitter_cookie.json";
 
-        public HttpClientWrapper(App config)
+        public HttpClientWrapper(App config, CookiesSelectConfig cookiesSelectConfig)
         {
+            _cookiesSelectHelper = new CookiesSelectHelper();
+            _cookiesSelectConfig = cookiesSelectConfig;
             _cookieContainer = new CookieContainer();
             var handler = new HttpClientHandler
             {
                 CookieContainer = _cookieContainer,
-                UseProxy = config.Proxys != null,
-                Proxy = config.Proxys != null ? new WebProxy(config.Proxys.Http) : null
+                UseProxy = config.Network != null,
+                Proxy = config.Network != null ? new WebProxy(config.Network.ProxyUrl) : null
             };
 
             _client = new HttpClient(handler);
@@ -55,32 +61,42 @@ namespace TAMDownload.Core.Utils
 
         private void LoadCookies()
         {
-            if (!File.Exists(CookieFile))
+            string cookieString;
+            if (_cookiesSelectConfig.SelectedID == null || _cookiesSelectHelper.Find(_cookiesSelectConfig.SelectedID) == null)
             {
-                Console.Write("请输入Cookie: ");
-                var cookieString = Console.ReadLine();
-                if (string.IsNullOrEmpty(cookieString)) return;
-
-                foreach (var cookie in cookieString.Split(';'))
+                if (File.Exists(CookieFile))
                 {
-                    var parts = cookie.Trim().Split('=');
-                    if (parts.Length == 2)
+                    var cookies = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(File.ReadAllText(CookieFile));
+                    foreach (var cookie in cookies)
                     {
-                        _cookieContainer.Add(new Uri("https://x.com"), new Cookie(parts[0], parts[1]));
+                        _cookieContainer.Add(new Uri("https://x.com"),
+                            new Cookie(cookie["Name"], cookie["Value"]));
                     }
+                    return;
                 }
 
-                SaveCookies();
+                Console.Write($"{LanguageHelper.CurrentLanguage.CoreMessage.EnterCookies} : ");
+                cookieString = Console.ReadLine();
             }
             else
             {
-                var cookies = JsonSerializer.Deserialize<List<Dictionary<string, string>>>(File.ReadAllText(CookieFile));
-                foreach (var cookie in cookies)
+                cookieString = _cookiesSelectHelper.Find(_cookiesSelectConfig.SelectedID).Cookie;
+                Console.WriteLine($"{LanguageHelper.CurrentLanguage.CoreMessage.CookiesByAccount} : {_cookiesSelectHelper.Find(_cookiesSelectConfig.SelectedID).AccountName}");
+            }
+
+            if (string.IsNullOrEmpty(cookieString))
+                return;
+
+            foreach (var cookie in cookieString.Split(';'))
+            {
+                var parts = cookie.Trim().Split('=');
+                if (parts.Length == 2)
                 {
-                    _cookieContainer.Add(new Uri("https://x.com"),
-                        new Cookie(cookie["Name"], cookie["Value"]));
+                    _cookieContainer.Add(new Uri("https://x.com"), new Cookie(parts[0], parts[1]));
                 }
             }
+
+            SaveCookies();
         }
 
         public string GetCookie(string name)
@@ -105,7 +121,7 @@ namespace TAMDownload.Core.Utils
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"解析twid时发生错误: {ex.Message}");
+                Console.WriteLine($"twid-{LanguageHelper.CurrentLanguage.GUIMessage.Error} : {ex.Message}");
                 return string.Empty;
             }
         }
@@ -113,6 +129,13 @@ namespace TAMDownload.Core.Utils
         public async Task<HttpResponseMessage> GetMediaAsync(string url)
         {
             var response = await _client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            return response;
+        }
+
+        public async Task<HttpResponseMessage> GetMediaAsync(string url, CancellationToken ct = default)
+        {
+            var response = await _client.GetAsync(url, ct);
             response.EnsureSuccessStatusCode();
             return response;
         }

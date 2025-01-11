@@ -46,5 +46,12 @@ namespace TAMDownload.Core.Utils
 
             return url.Split('.').Last().Split('?').First();
         }
+
+        public static string RemoveInvalidPathChars(string path)
+        {
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+            string pattern = "[" + Regex.Escape(new string(invalidChars)) + "]";
+            return Regex.Replace(path, pattern, string.Empty);
+        }
     }
 }

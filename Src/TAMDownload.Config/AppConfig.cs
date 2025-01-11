@@ -18,7 +18,15 @@ namespace TAMDownload.Config
             /// </summary>
             BookMarks,
             /// <summary>
-            /// 全部内容
+            /// 单账号内容
+            /// </summary>
+            Account,
+            /// <summary>
+            /// 单推文内容
+            /// </summary>
+            Tweet,
+            /// <summary>
+            /// 全部内容(点赞+书签)
             /// </summary>
             All
         }
@@ -40,10 +48,6 @@ namespace TAMDownload.Config
             /// 动图
             /// </summary>
             AnimatedGif,
-            /// <summary>
-            /// 全部
-            /// </summary>
-            All
         }
 
         /// <summary>
@@ -69,22 +73,85 @@ namespace TAMDownload.Config
         /// <summary>
         /// 获取类型
         /// </summary>
-        public GetTypes GetType { get; set; }
+        public new GetTypes GetType { get; set; }
+
+        /// <summary>
+        /// (单账号下载使用)类型信息
+        /// </summary>
+        public string? GetTypeMsg { get; set; }
 
         /// <summary>
         /// 获取类型
         /// </summary>
-        public DownloadTypes DownloadType { get; set; }
+        public List<DownloadTypes>? DownloadType { get; set; }
 
         /// <summary>
-        /// 代理配置
+        /// 网络配置
         /// </summary>
-        public ProxysConfig? Proxys { get; set; }
+        public NetworkConfig? Network { get; set; }
 
-        public class ProxysConfig
+        /// <summary>
+        /// 跳过推文屏蔽词配置
+        /// </summary>
+        public SkipTweetBlockedWordsConfig? SkipTweetBlockedWords { get; set; }
+
+        /// <summary>
+        /// 跳过推文时间段配置
+        /// </summary>
+        public SkipTweetDateTimeConfig? SkipTweetDateRange { get; set; }
+
+        /// <summary>
+        /// 语言代码
+        /// </summary>
+        public string? LanguageCode { get; set; }
+
+        public class NetworkConfig
         {
-            public string? Http { get; set; }
-            public string? Https { get; set; }
+            /// <summary>
+            /// 代理配置
+            /// </summary>
+            public string? ProxyUrl { get; set; }
+
+            /// <summary>
+            /// TimeOut时间(s)
+            /// </summary>
+            public int TimeOut { get; set; }
+
+            /// <summary>
+            /// 重试次数
+            /// </summary>
+            public int RetryTime { get; set; }
+        }
+
+        public class SkipTweetBlockedWordsConfig
+        {
+            /// <summary>
+            /// 是否启用
+            /// </summary>
+            public bool IsEnable { get; set; }
+
+            /// <summary>
+            /// 推文屏蔽词
+            /// </summary>
+            public List<string>? BlockedWords { get; set; }
+        }
+
+        public class SkipTweetDateTimeConfig
+        {
+            /// <summary>
+            /// 是否启用
+            /// </summary>
+            public bool IsEnable { get; set; }
+
+            /// <summary>
+            /// 开始时间
+            /// </summary>
+            public long? StartTimestamp { get; set; }
+
+            /// <summary>
+            /// 结束时间
+            /// </summary>
+            public long? EndTimestamp { get; set; }
         }
 
         /// <summary>
@@ -131,12 +198,31 @@ namespace TAMDownload.Config
                 Ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
                 SavePath = ".\\media",
                 GetType = GetTypes.Likes,
-                DownloadType = DownloadTypes.All,
-                Proxys = new ProxysConfig
+                GetTypeMsg = string.Empty,
+                DownloadType = new List<DownloadTypes>
                 {
-                    Http = "http://127.0.0.1:7890",
-                    Https = "http://127.0.0.1:7890"
-                }
+                    DownloadTypes.Photo,
+                    DownloadTypes.Video,
+                    DownloadTypes.AnimatedGif,
+                },
+                Network = new NetworkConfig
+                {
+                    ProxyUrl = "http://127.0.0.1:7890",
+                    TimeOut = 30,
+                    RetryTime = 5,
+                },
+                SkipTweetBlockedWords = new SkipTweetBlockedWordsConfig
+                {
+                    IsEnable = false,
+                    BlockedWords = [],
+                },
+                SkipTweetDateRange = new SkipTweetDateTimeConfig
+                {
+                    IsEnable = false,
+                    StartTimestamp = 1735660800,
+                    EndTimestamp = 1735660800,
+                },
+                LanguageCode = "zh_CN",
             };
 
             if (!Directory.Exists(Path.GetDirectoryName(JsonPath)))

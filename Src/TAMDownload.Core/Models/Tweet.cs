@@ -15,6 +15,9 @@ namespace TAMDownload.Core.Models
         [JsonProperty("hashtags")]
         public List<string> Hashtags { get; set; } = new();
 
+        [JsonProperty("created_at")]
+        public string? CreatedAt { get; set; }
+
         [JsonProperty("media")]
         public List<Media> Media { get; set; } = new();
     }

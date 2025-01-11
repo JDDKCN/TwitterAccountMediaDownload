@@ -15,6 +15,12 @@ namespace TAMDownload.Core.Models
 
         [JsonPropertyName("bookmark_timeline_v2")]
         public TimelineV2Content BookmarkTimelineV2 { get; set; }
+
+        [JsonPropertyName("user_result_by_screen_name")]
+        public UserResults UserResultByScreenName { get; set; }
+
+        [JsonPropertyName("threaded_conversation_with_injections_v2")]
+        public TimelineContent ThreadedConversationV2 { get; set; }
     }
 
     public class UserContent
@@ -64,8 +70,14 @@ namespace TAMDownload.Core.Models
         [JsonPropertyName("type")]
         public string Type { get; set; }
 
+        [JsonPropertyName("direction")]
+        public string Direction { get; set; }
+
         [JsonPropertyName("entries")]
         public List<TimelineEntry> Entries { get; set; }
+
+        [JsonPropertyName("moduleItems")]
+        public List<ItemMedia> ModuleItems { get; set; }
     }
 
     public class TimelineEntry
@@ -93,6 +105,28 @@ namespace TAMDownload.Core.Models
 
         [JsonPropertyName("value")]
         public string Value { get; set; }
+
+        // Media API使用
+        [JsonPropertyName("items")]
+        public List<ItemMedia> Items { get; set; }
+
+        [JsonPropertyName("cursorType")]
+        public string CursorType { get; set; }
+    }
+
+    public class ItemMedia
+    {
+        [JsonPropertyName("entryId")]
+        public string EntryId { get; set; }
+
+        [JsonPropertyName("item")]
+        public ItemDetail Item { get; set; }
+    }
+
+    public class ItemDetail
+    {
+        [JsonPropertyName("itemContent")]
+        public ItemContent ItemContent { get; set; }
     }
 
     public class ItemContent
