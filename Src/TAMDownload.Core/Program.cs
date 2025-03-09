@@ -6,6 +6,7 @@ using TAMDownload.Core.Managers;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using TAMDownload.Core.Utils;
 
 namespace TAMDownload.Core
 {
